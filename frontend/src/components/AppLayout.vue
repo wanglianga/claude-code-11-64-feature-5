@@ -9,6 +9,7 @@
         <router-link to="/inspections">检测归档与对齐</router-link>
         <router-link to="/clusters">缺陷聚类与冲突</router-link>
         <router-link to="/datasets">评估数据集与顺位</router-link>
+        <router-link to="/cohorts">材料年代队列统计</router-link>
         <router-link to="/rules">判读规则</router-link>
         <router-link to="/audit">审计日志</router-link>
       </nav>
@@ -43,6 +44,7 @@ const titles = {
   inspections: '检测归档：视频索引、观察与位置对齐',
   clusters: '缺陷聚类：去重、冲突与人工裁决',
   datasets: '评估数据集：风险顺位与历史复现',
+  cohorts: '材料/年代队列：年龄分层缺陷比例、复发率与有效检查覆盖',
   rules: '判读规则（入围门槛）',
   audit: '审计日志'
 }

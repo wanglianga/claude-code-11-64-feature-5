@@ -1,6 +1,7 @@
 package com.ccdev.drainage.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -87,5 +88,56 @@ public final class Models {
 
     public record AuditLog(Long id, Long userId, String action, String targetRef, String detail,
                            LocalDateTime createdAt) {
+    }
+
+    // ------------------------------------------------------------ 材料/年代队列域
+    public record SourceVersion(Long id, String sourceDomain, String versionNo, String sourceNote,
+                                Long createdBy, LocalDateTime createdAt) {
+    }
+
+    /** 资产沿革区间：投用/换管/内衬/材料变更/退役；ageReset=true 时服役年龄从 from 重新起算。 */
+    public record AssetHistory(Long id, String physicalPipeCode, String segmentCode, String eventType,
+                               String material, Integer diameterMm, Integer commissionYear, BigDecimal lengthM,
+                               LocalDateTime effectiveFrom, LocalDateTime effectiveTo, Boolean ageReset,
+                               Long sourceVersionId, String evidenceRef, Long supersededById) {
+    }
+
+    /** 检查暴露：有观察范围的检测时段；OBSCURED 为遮挡，不计无缺陷；REVOKED 为撤销留痕。 */
+    public record InspectionExposure(Long id, String physicalPipeCode, String segmentCode, String batchCode,
+                                     LocalDateTime inspectedAt, BigDecimal stationStartM, BigDecimal stationEndM,
+                                     String coverageStatus, String obscuredReason, String riskZone,
+                                     Long sourceVersionId, String status, Long revokedByVersionId,
+                                     String evidenceRef) {
+    }
+
+    /** 缺陷事件：复发关联 originalEventId 与同一 exposureKey，不拆成独立管段。 */
+    public record DefectEvent(Long id, String physicalPipeCode, String segmentCode, String eventKind,
+                              Long originalEventId, String defectType, Integer normalizedGrade,
+                              BigDecimal stationStartM, BigDecimal stationEndM, LocalDateTime foundAt,
+                              String exposureKey, String repairId, LocalDateTime repairedAt, String repairMethod,
+                              String postRepairStatus, Long sourceVersionId, String evidenceRef) {
+    }
+
+    public record CohortRun(Long id, String runCode, LocalDate asOfDate, String estimationMethod,
+                            Integer ageBandYears, Long assetVersionId, Long exposureVersionId,
+                            Long defectVersionId, String selectionModel, String methodNote,
+                            String nonInferenceNote, String status, Long supersededRunId,
+                            Long generatedBy, LocalDateTime generatedAt) {
+    }
+
+    /** 队列结果单元格：材料 × 投用年代 × 管径 × 年龄层，分母/权重/证据全部可追溯。 */
+    public record CohortCell(Long id, Long runId, String material, String commissionDecade,
+                             String diameterBand, String ageBand, BigDecimal totalLengthM,
+                             BigDecimal inspectedLengthM, BigDecimal obscuredLengthM, BigDecimal effectiveCoverage,
+                             Integer defectEventCount, Integer firstFindingCount, Integer recurrenceCount,
+                             BigDecimal defectiveLengthM, BigDecimal defectRatio, BigDecimal recurrenceRate,
+                             BigDecimal weightSum, BigDecimal weightedDefectLength, BigDecimal weightedInspectedLength,
+                             BigDecimal weightedDefectRatio, BigDecimal minWeight, BigDecimal maxWeight,
+                             String evidenceSources, Boolean lowCoverageFlag, Boolean extremeWeightFlag,
+                             Boolean nonInferableFlag) {
+    }
+
+    public record CohortEvidence(Long id, Long runId, String cellKey, String evidenceKind,
+                                 String sourceRef, String detail) {
     }
 }
